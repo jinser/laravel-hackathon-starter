@@ -17,7 +17,7 @@ class CreateUsersTable extends Migration
             $table->string('fullname')->nullable();
             $table->string('username')->nullable()->unique();
             $table->string('email')->nullable()->unique();
-            $table->string('password', 60)->nullable();
+            $table->string('password', 255)->nullable();
             $table->char('gender')->nullable();
             $table->text('location')->nullable();
             $table->text('website')->nullable();
@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->string('oauth_token_secret')->nullable();
             $table->string('provider_id')->unique()->nullable();
             $table->string('avatar')->nullable();
+            $table->integer('role_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

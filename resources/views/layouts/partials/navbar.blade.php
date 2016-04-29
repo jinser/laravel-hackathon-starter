@@ -11,14 +11,15 @@
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="{{ request()->path() == "/" ? 'active' : 'n' }}"><a href="/">Home</a></li>
+                <li class="{{ request()->path() == "/home" ? 'active' : 'n' }}"><a href="/home">Home</a></li>
                 <li class="{{ request()->path() == "api" ? 'active' : 'n' }}"><a href="/api">API Examples</a></li>
                 <li class="{{ request()->path() == "contact" ? 'active' : 'n' }}"><a href="/contact">Contact</a></li>
+                <li>{{Auth::guest()}}</li>
             </ul>
-
+            
             @if (Auth::guest())
             <ul class="nav navbar-nav navbar-right">
-                <li class="{{ request()->path() == "login" ? 'active' : 'n' }}"><a href="/login">Login</a></li>
+                <li class="{{ request()->path() == "login" ? 'active' : 'n' }}"><a href="auth/login">Login</a></li>
                 <li class="{{ request()->path() == "signup" ? 'active' : 'n' }}"><a href="/signup">Create Account</a></li>
             </ul>
             @else
@@ -29,7 +30,7 @@
                 </a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="{{ route('account.dashboard') }}"><i class="fa fa-btn fa-user"></i> My Account</a></li>
-                    <li><a href="{{ route('logout') }}"><i class="fa fa-btn fa-sign-out"></i> Logout</a></li>
+                    <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i> Logout</a></li>
                 </ul>
             </li>
             </ul>

@@ -23,15 +23,44 @@
 |
 */
 
+
 Route::group(['middleware' => ['web']], function () {
 
     Route::get('/', function () {
         return view('welcome');
     });
+    
+    Route::get('/home', [
+        'uses' => 'HomeController@index',
+        'middleware' => ['auth','roles'],
+        'roles' => ['Merchant','Customer']
+    ]);
 
     Route::get('/api', function () {
         return view('apidashboard');
     });
+    
+    Route::get('/auth/login', [
+        'uses' => 'Auth\AuthController@getLogin',
+        'as'   => 'auth.login',
+        'middleware' => ['guest']
+    ]);
+
+    Route::post('/auth/login', [
+        'uses' => 'Auth\AuthController@postLogin',
+        'middleware' => ['guest']
+    ]);
+    
+    Route::get('/logout', [
+        'uses' => 'Auth\AuthController@getLogout',
+        'as' =>'auth.logout'
+    ]);
+    
+    Route::get('/auth/register',[
+        'uses' => 'Auth\AuthController@getRegister',
+        'as' => 'auth.login',
+        'middleware' => ['guest']
+    ]);
 
     Route::group(['prefix' => 'api'], function() {
         Route::get('github', [
@@ -154,17 +183,6 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
 
-    Route::get('/login', [
-        'uses' => 'Auth\AuthController@getLogin',
-        'as'   => 'auth.login',
-        'middleware' => ['guest']
-    ]);
-
-    Route::post('/login', [
-        'uses' => 'Auth\AuthController@postLogin',
-        'middleware' => ['guest']
-    ]);
-
     // Password Reset Routes...
     Route::get('password/reset/{token?}', 'Auth\PasswordController@showResetForm');
     Route::post('password/email', 'Auth\PasswordController@sendResetLinkEmail');
@@ -222,11 +240,6 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['guest']
     ]);
 
-    Route::get('logout', [
-        'uses' => 'Auth\AuthController@logout',
-        'as' => 'logout',
-    ]);
-
     Route::post('/signup', [
         'uses' => 'Auth\AuthController@postRegister',
         'middleware' => ['guest']
@@ -240,4 +253,6 @@ Route::group(['middleware' => ['web']], function () {
         'uses' => 'ContactController@sendMessage',
         'as'   => 'contact'
     ]);
+    Route::auth();
 });
+

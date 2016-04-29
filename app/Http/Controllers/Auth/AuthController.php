@@ -23,6 +23,45 @@ class AuthController extends Controller
 
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
 
+
+    public function postLogin() {
+        //validate the login credentials
+        $rules = array (
+            'email' => 'required|email', //ensures email is an actual email
+            'password' => 'required|alphaNum|min:3' //password can only be alphanumeric and has to be greater than 3 characters
+        );
+        
+        //run the validator on the inputs from form
+        $login_validator = Validator::make(Input::all(),$rules);
+        
+        if($login_validator->fails()) {
+            return Redirect::to('/auth/login')
+                ->withErrors($login_validator)
+                ->withInput(Input::except('password'));
+        }
+        else {
+            $userdata = array(
+                'email' => Input::get('email'),
+                'password' => Input::get('password')
+            );
+        }
+        
+        if(Auth::attempt($userdata)) {
+            //validation successful
+            return Redirect::to('/api');
+        }
+        else {
+            return Redirect::to('/auth/login');
+        }
+    }
+    
+    public function getLogout() {
+        if(Auth::check()) {
+            Auth::logout();
+            Session::flush();
+            return Redirect::to('/');    
+        }
+    }
     /**
      * Where to redirect users after login / registration.
      *
