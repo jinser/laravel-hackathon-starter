@@ -16,19 +16,19 @@ class RolesTableSeeder extends Seeder
         DB::table('roles')->delete();
         
         Role::create([
-            'id'                 => 1,
-            'role_name'          => 'SuperAdmin',
-            'role_description'   => 'SuperAdmin user for complete root access.'
+            'id' => 1,
+            'role_name' => 'SuperAdmin',
+            'role_description' => 'SuperAdmin user for complete root access.'
         ]);
         Role::create([
-            'id'                 => 2,
-            'role_name'          => 'Merchant',
-            'role_description'   => 'Merchant users '
+            'id' => 2,
+            'role_name' => 'Merchant',
+            'role_description' => 'Merchant users '
         ]);
         Role::create([
-            'id'                 => 3,
-            'role_name'           => 'Customer',
-            'role_description'   => 'Customers of Merchant, end users '
+            'id' => 3,
+            'role_name' => 'Customer',
+            'role_description' => 'Customers of Merchant, end users '
         ]);
     }
 }

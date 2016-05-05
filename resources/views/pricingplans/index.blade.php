@@ -11,7 +11,7 @@
                   
                    @if (Auth::user()->hasRole('Merchant'))
                    <!-- New Pricing Plan -->
-                   <form action="/home" method="POST" class="form-horizontal">
+                   <form action="/pricingplans" method="POST" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="form-group">
                             <label for="pricingplan-name" class="col-sm-3 control-label">Plan Name</label>
@@ -47,12 +47,12 @@
                                <td>{{ $pricingPlan->currency }}</td>
                                <td>{{ number_format($pricingPlan->price,'2','.',',') }}</td>
                                <td>
-                                   <form action="/home/{{$pricingPlan->id}}" method="POST">
+                                   <form action="/pricingplans/{{$pricingPlan->id}}" method="POST">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
                                         <button>Delete Plan</button>
                                    </form>
-                                    <form action="/home/{{$pricingPlan->id}}/edit" method="GET">
+                                    <form action="/pricingplans/{{$pricingPlan->id}}/edit" method="GET">
                                          {{ csrf_field() }}
                                          <button>Edit Plan</button>
                                     </form>

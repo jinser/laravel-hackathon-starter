@@ -82,4 +82,12 @@ class User extends Authenticatable
 	{
 		return (strtolower($need_role)==strtolower($this->have_role->role_name)) ? true : false;
 	}
+	
+	/**
+	 * Pricing Plan Extension
+	 */
+	
+	public function pricingPlans() {
+	    return $this->hasMany(PricingPlan::class);
+	}
 }

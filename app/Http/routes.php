@@ -30,8 +30,7 @@ Route::group(['middleware' => ['web']], function () {
         return view('welcome');
     });
     
-    Route::get('/home', [
-        'uses' => 'HomeController@index',
+    Route::resource('pricingplans','PricingPlanController',[
         'middleware' => ['auth','roles'],
         'roles' => ['Merchant','Customer']
     ]);

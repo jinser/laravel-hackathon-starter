@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Roles extends Migration
+class CreateRolesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class Roles extends Migration
      */
     public function up()
     {
-        Schema::create('roles', function (Blueprint $table) {
+         Schema::create('roles', function (Blueprint $table) {
            $table->increments('id');
            $table->string('role_name',40);
            $table->string('role_description',255);
@@ -27,6 +27,6 @@ class Roles extends Migration
      */
     public function down()
     {
-        Schema::drop('roles');
+         Schema::drop('roles');
     }
 }

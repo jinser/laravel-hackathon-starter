@@ -12,6 +12,7 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="{{ request()->path() == "/home" ? 'active' : 'n' }}"><a href="/home">Home</a></li>
+                <li class="{{ request()->path() == "/pricingplans" ? 'active' : 'n' }}"><a href="/pricingplans">Pricing Plans</a></li>
                 <li class="{{ request()->path() == "api" ? 'active' : 'n' }}"><a href="/api">API Examples</a></li>
                 <li class="{{ request()->path() == "contact" ? 'active' : 'n' }}"><a href="/contact">Contact</a></li>
                 <li>{{Auth::guest()}}</li>
