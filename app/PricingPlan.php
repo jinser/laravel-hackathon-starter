@@ -37,9 +37,6 @@ class PricingPlan extends Model
          return $pricingPlans;
      }
      
-     public function user() {
-         return $this->belongsTo(User::class);
-     }
      
      
     

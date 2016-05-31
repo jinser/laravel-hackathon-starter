@@ -15,10 +15,10 @@
                        {{ csrf_field() }}
                        {{ method_field('PATCH') }}
                     <div class="form-group">
-                          <label for="pricingplan-price" class="col-sm-3 control-label">Update Plan Price</label>  
+                          <label for="pricingplan-amount" class="col-sm-3 control-label">Update Plan Price</label>  
                           <div class="col-sm-6">
                               <input type="text" name="name" id="pricingplan-name" class="form-control" value={{$editPlan->name}}>
-                              <input type="text" name="price" id="pricingplan-price" class="form-control" value={{$editPlan->price}}>
+                              <input type="text" name="price" id="pricingplan-amount" class="form-control" value={{number_format($editPlan->amount/100,'2','.',',')}}>
                               <input type="text" name="currency" id="pricingplan-currency" class="form-control" value={{$editPlan->currency}}>
                                 <button>Update</button>
                           </div>

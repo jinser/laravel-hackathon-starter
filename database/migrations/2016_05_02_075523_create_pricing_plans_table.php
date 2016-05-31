@@ -18,10 +18,9 @@ class CreatePricingPlansTable extends Migration
            $table->integer('billing_frequency_length')->default(1);
            $table->string('billing_frequency_period',40)->default('month');
            $table->string('currency',3);
-           $table->decimal('price',15,6);
+           $table->decimal('price',15,2);
            $table->string('description',255)->nullable();
            $table->integer('display_order')->nullable();
-            $table->integer('user_id')->nullable();
            $table->softDeletes();
            $table->timestamps();
         });

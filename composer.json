@@ -23,7 +23,9 @@
         "socialiteproviders/foursquare": "^1.1",
         "hownowstephen/php-foursquare": "1.2.*",
         "jaapz/tumblr": "dev-master",
-        "dandelionmood/lastfm": "^0.6.0"
+        "dandelionmood/lastfm": "^0.6.0",
+        "laravel/cashier": "~6.0",
+         "stripe/stripe-php": "3.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

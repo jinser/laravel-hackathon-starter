@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+
 use App\Http\Requests;
+use App\Http\Controllers\Controller;
 use App\PricingPlan;
 
-class PricingPlanController extends Controller
+class LivePricingPlanApiController extends Controller
 {
-    /**
+     /**
      * Create a new controller instance.
      *
      * @return void
@@ -17,10 +19,9 @@ class PricingPlanController extends Controller
     {
 
     }
-
+    
     /**
-     * Show the application dashboard.
-     * Get all plans from Stripe
+     * Get all live plans from Stripe
      *
      * Stripe response attributes:
      * has_more
@@ -43,17 +44,16 @@ class PricingPlanController extends Controller
     public function index()
     {
         $this->_setStripeKey();
-        
-        $pricingPlans = \Stripe\Plan::all();
-        
-        return view('pricingplans.index')->with('pricingPlans',$pricingPlans->data);
-    }
-    
-    public function create() {
-        
+        $response = \Stripe\Plan::all();
+        return response()->json($response);
     }
     
     /**
+     * Enable plan to go live in Stripe
+     * 
+     * Request attribute:
+     * contains id of the plan in database
+     * 
      * Stripe request attributes:
      * interval, possible ENUMs: day, week, month,year
      * amount (in cents)
@@ -78,16 +78,22 @@ class PricingPlanController extends Controller
      * 
      */ 
     public function store(Request $request) {
-       
-        $dbResponse = PricingPlan::create([
-            'name' => $request->name,
-            'price' => $request->price,
-            'currency' => 'SGD'
-        ]);
+        $this->_setStripeKey();
+        //get plan id from database
+        $dbPlan = PricingPlan::findOrFail($request->id);
         
-    
-    return redirect('pricingplans');
+        //create plan in stripe with the same id
+        $response = \Stripe\Plan::create(array(
+          "amount" => $dbPlan->price*100,
+          "interval" => $dbPlan->billing_frequency_period,
+          "interval_count" => $dbPlan->billing_frequency_length,
+          "name" => $dbPlan->name,
+          "currency" => $dbPlan->currency,
+          "id" => $dbPlan->id)
+        );
+        return response()->json($response);
     }
+    
     
     public function show($id) {
         
@@ -115,15 +121,15 @@ class PricingPlanController extends Controller
         $err = "general error has occurred.";
         
         try {
-            $editPlan = \Stripe\Plan::retrieve($id);
-            return View('pricingplans.edit')->with('editPlan',$editPlan);
+            $response = \Stripe\Plan::retrieve($id);
+            return response()->json($response);
         }
         catch(\Stripe\Error $e) {
-             $body = $e->getJsonBody();
+          $body = $e->getJsonBody();
           $err  = $body['error'];
         }
         catch(\Stripe\Error\Card $e) {
-          // Since it's a decline, \Stripe\Error\Card will be caught
+          //Card decline
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\RateLimit $e) {
@@ -135,8 +141,7 @@ class PricingPlanController extends Controller
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\Authentication $e) {
-          // Authentication with Stripe's API failed
-          // (maybe you changed API keys recently)
+          // Authentication with Stripe's API failed, check if API keys changed recently
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\ApiConnection $e) {
@@ -144,20 +149,18 @@ class PricingPlanController extends Controller
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\Base $e) {
-          // Display a very generic error to the user, and maybe send
-          // yourself an email
+          //Generic Stripe Error
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (Exception $e) {
-          // Something else happened, completely unrelated to Stripe
+          // Non-Stripe related error
           $body = $e->getJsonBody();
           $err  = $body['error'];
         }
-        
-        
-        return redirect('pricingplans');
-        
-        
+        $response = [
+            'error' =>  $err
+        ];
+        return response()->json($response);
     }
     
     /**
@@ -172,19 +175,20 @@ class PricingPlanController extends Controller
      */
     public function update(Request $request, $id) {
         $this->_setStripeKey();
+        $err = "general error has occurred.";
         
         try {
-            $plan = \Stripe\Plan::retrieve($id);
-            $plan->name=$request->name;
-            $plan->save();
-            
+            $response = \Stripe\Plan::retrieve($id);
+            $response->name=$request->name;
+            $response->save();
+            return response()->json($response);
         }
-        catch(\Stripe\Error $e) {
-             $body = $e->getJsonBody();
+       catch(\Stripe\Error $e) {
+          $body = $e->getJsonBody();
           $err  = $body['error'];
         }
         catch(\Stripe\Error\Card $e) {
-          // Since it's a decline, \Stripe\Error\Card will be caught
+          //Card decline
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\RateLimit $e) {
@@ -196,8 +200,7 @@ class PricingPlanController extends Controller
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\Authentication $e) {
-          // Authentication with Stripe's API failed
-          // (maybe you changed API keys recently)
+          // Authentication with Stripe's API failed, check if API keys changed recently
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\ApiConnection $e) {
@@ -205,21 +208,21 @@ class PricingPlanController extends Controller
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\Base $e) {
-          // Display a very generic error to the user, and maybe send
-          // yourself an email
+          //Generic Stripe Error
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (Exception $e) {
-          // Something else happened, completely unrelated to Stripe
+          // Non-Stripe related error
           $body = $e->getJsonBody();
           $err  = $body['error'];
         }
-        
-        return redirect('pricingplans');
-        
+        $response = [
+            'error' =>  $err
+        ];
+        return response()->json($response);
     }
     
-    /**
+     /**
      * deleting plans does not affect current subscribers, new subscribers cannot be added
      * 
      * Stripe request attributes
@@ -232,19 +235,20 @@ class PricingPlanController extends Controller
      */
     public function destroy(Request $request, $id) {
         
-         $this->_setStripeKey();
+        $this->_setStripeKey();
+        $err = "general error has occurred.";
         
         try {
-            $plan = \Stripe\Plan::retrieve($id);
-            $plan->delete();
-            
+            $response = \Stripe\Plan::retrieve($id);
+            $response->delete();
+             return response()->json($response);
         }
         catch(\Stripe\Error $e) {
-             $body = $e->getJsonBody();
+          $body = $e->getJsonBody();
           $err  = $body['error'];
         }
         catch(\Stripe\Error\Card $e) {
-          // Since it's a decline, \Stripe\Error\Card will be caught
+          //Card decline
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\RateLimit $e) {
@@ -256,8 +260,7 @@ class PricingPlanController extends Controller
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\Authentication $e) {
-          // Authentication with Stripe's API failed
-          // (maybe you changed API keys recently)
+          // Authentication with Stripe's API failed, check if API keys changed recently
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\ApiConnection $e) {
@@ -265,21 +268,21 @@ class PricingPlanController extends Controller
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (\Stripe\Error\Base $e) {
-          // Display a very generic error to the user, and maybe send
-          // yourself an email
+          //Generic Stripe Error
           $body = $e->getJsonBody();
           $err  = $body['error'];
         } catch (Exception $e) {
-          // Something else happened, completely unrelated to Stripe
+          // Non-Stripe related error
           $body = $e->getJsonBody();
           $err  = $body['error'];
         }
-        
-        return redirect('pricingplans');
+        $response = [
+            'error' =>  $err
+        ];
+        return response()->json($response);
     }
     
-    private function _setStripeKey() {
+     private function _setStripeKey() {
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
     }
-    
 }

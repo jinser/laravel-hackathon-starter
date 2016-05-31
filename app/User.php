@@ -3,9 +3,11 @@
 namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable
 {
+    use Billable;
     /**
      * The attributes that are mass assignable.
      *
@@ -73,6 +75,7 @@ class User extends Authenticatable
 		return false;
     }
     
+    
     private function getUserRole()
 	{
 		return $this->role()->getResults();
@@ -83,11 +86,4 @@ class User extends Authenticatable
 		return (strtolower($need_role)==strtolower($this->have_role->role_name)) ? true : false;
 	}
 	
-	/**
-	 * Pricing Plan Extension
-	 */
-	
-	public function pricingPlans() {
-	    return $this->hasMany(PricingPlan::class);
-	}
 }

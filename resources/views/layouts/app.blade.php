@@ -48,7 +48,7 @@
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url('/home') }}">Home</a></li>
-                    <li><a href="{{ url('/pricingplans') }}">Pricing Plans</a></li>
+                    <li><a href="{{ url('/api/pricingplans') }}">Pricing Plans</a></li>
                 </ul>
 
                 <!-- Right Side Of Navbar -->

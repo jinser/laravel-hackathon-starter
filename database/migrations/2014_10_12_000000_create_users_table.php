@@ -29,6 +29,12 @@ class CreateUsersTable extends Migration
             $table->integer('role_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            
+            //cashier extensions
+            $table->string('stripe_id')->nullable();
+            $table->string('card_brand')->nullable();
+            $table->string('card_last_four')->nullable();
+            $table->timestamp('trial_ends_at')->nullable();
         });
     }
 
