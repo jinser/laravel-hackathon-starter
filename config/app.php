@@ -163,7 +163,8 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Laravel\Cashier\CashierServiceProvider::class
+        Laravel\Cashier\CashierServiceProvider::class,
+        Zizaco\Entrust\EntrustServiceProvider::class,
 
     ],
 
@@ -228,6 +229,7 @@ return [
         'SlackUserAdmin'        => Vluzrmos\SlackApi\Facades\SlackUserAdmin::class,
         'SlackRealTimeMessage'  => Vluzrmos\SlackApi\Facades\SlackRealTimeMessage::class,
         'SlackTeam'             => Vluzrmos\SlackApi\Facades\SlackTeam::class,
+        'Entrust'   => Zizaco\Entrust\EntrustFacade::class,
 
     ],
 

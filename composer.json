@@ -25,7 +25,8 @@
         "jaapz/tumblr": "dev-master",
         "dandelionmood/lastfm": "^0.6.0",
         "laravel/cashier": "~6.0",
-         "stripe/stripe-php": "3.*"
+        "stripe/stripe-php": "3.*",
+        "zizaco/entrust":"dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

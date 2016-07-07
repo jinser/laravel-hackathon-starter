@@ -146,28 +146,25 @@ Route::group(['middleware' => ['web']], function () {
 |--------------------------------------------------------------------------
 */
 
-Route::group(['middleware' => ['web']], function () {
-
-    Route::resource('pricingplans','PricingPlanController',[
-    'middleware' => ['auth','roles'],
-    'roles' => ['Merchant']
-    ]);
-        
-   Route::group(['prefix' => 'api'], function() {
-       
-        Route::resource('pricingplans','Api\PricingPlanApiController',[
-            'middleware' => ['auth','roles'],
-            'roles' => ['Merchant']
-        ]);
-        
-        Route::resource('livepricingplans','Api\LivePricingPlanApiController',[
-            'middleware' => ['auth','roles'],
-            'roles' => ['Merchant']
-        ]);
-        
-        Route::resource('subscriptions','Api\SubscriptionApiController',[
-            'middleware' => ['auth','roles'],
-            'roles' => ['Customer']
-        ]);
+Route::group(['middleware' => ['auth.basic'], 'prefix' => 'api'], function() {
+    Route::group(['middleware' => ['permission:create_pricingplan']], function() {
+        Route::resource('pricingplans','Api\PricingPlanApiController');
+        //Route::get('api/pricingplans',['uses' => 'Api\PricingPlanApiController@index']);
     });
+
+    Route::group(['middleware' => ['permission:create_livepricingplan']], function() {
+     
+        Route::resource('livepricingplans','Api\LivePricingPlanApiController');
+    });
+    
+    Route::group(['middleware' => ['permission:create_customeraccount']], function() {
+     
+        Route::resource('customeraccount','Api\CustomerAccountApiController');
+    });
+    
+    Route::group(['middleware' => ['permission:create_subscription']], function() {
+     
+        Route::resource('subscriptions','Api\SubscriptionApiController');
+    });
+    
 });

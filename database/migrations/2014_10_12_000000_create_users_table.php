@@ -26,7 +26,6 @@ class CreateUsersTable extends Migration
             $table->string('oauth_token_secret')->nullable();
             $table->string('provider_id')->unique()->nullable();
             $table->string('avatar')->nullable();
-            $table->integer('role_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
             

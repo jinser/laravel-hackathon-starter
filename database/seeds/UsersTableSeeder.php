@@ -17,24 +17,21 @@ class UsersTableSeeder extends Seeder
             'fullname' => 'superadmin',
             'username' => 'superadmin',
             'email' => 'superadmin@test.com',
-            'password' => Hash::make('welcome1'),
-            'role_id' => '1'
+            'password' => Hash::make('welcome1')
             ));
             
         User::create(array(
             'fullname' => 'merchant_fullname',
             'username' => 'test_merchant',
             'email' => 'merchant@test.com',
-            'password' => Hash::make('welcome1'),
-            'role_id' => '2'
+            'password' => Hash::make('welcome1')
             ));
        
         User::create(array(
             'fullname' => 'customer_fullname',
             'username' => 'test_customer',
             'email' => 'customer@test.com',
-            'password' => Hash::make('welcome1'),
-            'role_id' => '3'
+            'password' => Hash::make('welcome1')
             )); 
     }
 }

@@ -4,9 +4,11 @@ namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Cashier\Billable;
+use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Authenticatable
 {
+    use EntrustUserTrait;
     use Billable;
     /**
      * The attributes that are mass assignable.
@@ -15,7 +17,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'fullname', 'username', 'email', 'password', 'provider_id', 'provider',
-        'avatar', 'gender', 'location', 'website', 'oauth_token', 'oauth_token_secret'
+        'avatar', 'gender', 'location', 'website', 'oauth_token', 'oauth_token_secret',
+        'stripe_id', 'trial_ends_at','subscription_ends_at'
     ];
 
     /**
@@ -45,45 +48,5 @@ class User extends Authenticatable
     {
         return $this->oauth_token_secret;
     }
-    
-    /**
-     * Role extension 
-     **/
-    
-    public function role() {
-        return $this->hasOne('App\Role', 'id', 'role_id');
-    }
-    
-    public function hasRole($roles) {
-        $this->have_role = $this->getUserRole();
-		
-		// Supercedes default check - Superadmin account will have access to all pages
-		if($this->have_role->role_name == 'SuperAdmin') {
-			return true;
-		}
-		
-		if(is_array($roles)){
-			foreach($roles as $need_role){
-				if($this->checkIfUserHasRole($need_role)) {
-					return true;
-				}
-			}
-		} 
-		else {
-			return $this->checkIfUserHasRole($roles);
-		}
-		return false;
-    }
-    
-    
-    private function getUserRole()
-	{
-		return $this->role()->getResults();
-	}
-	
-	private function checkIfUserHasRole($need_role)
-	{
-		return (strtolower($need_role)==strtolower($this->have_role->role_name)) ? true : false;
-	}
 	
 }
