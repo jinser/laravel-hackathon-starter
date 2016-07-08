@@ -60,50 +60,56 @@ class SubscriptionApiController extends Controller
      * User object that has the credit card token
      * 
      * $request should contain:
+     * planid
      * plan name
      * frequency
      */
     public function store(Request $request) {
         $user = \Auth::user();
-        /*
-        $user = User::create(array(
-            "email" => "customer3@test.com",
-            "password" => "welcome1",
-            "role_id" => 3
-        ));*/
-        
+       
         //if user is subscribed, update the plan
         if($user->subscribed()) {
             $success = 'success';
         }
         
-        $pricingPlanName = $request->pricingPlanName;
-        $pricingPlanFrequency = $request->pricingPlanFrequency;
+        //get plan details
+        $plan = PricingPlan::findOrFail($request->planid);
+        $pricingPlanFrequency = $plan->billing_frequency_period;
         if($pricingPlanFrequency == 'month') {
             $pricingPlanFrequency = 'monthly';
         }
-        //$plan = PricingPlan::where("name",$pricingPlanName);
-        $plan = PricingPlan::find(12);
-        /*
-        //create sample token
-        $this->_setStripeKey();
         
-        $creditCardToken = \Stripe\Token::create(array(
-          "card" => array(
-            "number" => "4242424242424242",
-            "exp_month" => 1,
-            "exp_year" => 2019,
-            "cvc" => "314"
-          )
-        ));
-
+        //check that plan is live
+        $response = \Stripe\Plan::retrieve($request->planid);
+        if($response == null) {
+            $finalResponse = [
+                    'error' => 'plan is not live.'
+                ];
+            return response()->json($finalResponse);   
+        }
+       
+        //create sample token if does not exist
+        if($user->card_brand == null) {
+            $this->_setStripeKey();
+            
+            $creditCardToken = \Stripe\Token::create(array(
+              "card" => array(
+                "number" => "4242424242424242",
+                "exp_month" => 1,
+                "exp_year" => 2019,
+                "cvc" => "314"
+              )
+            ));
+        }
+        
+        //create subscription with laravel cashier
         $user->newSubscription(
-            $pricingPlanName,
-            12
+            $plan->name,
+            $request->planid
         )->create($creditCardToken->id);
         //first param is plan name e.g. stripe test 2
         //second param is the id of the plan in Stripe (id field, also is id of pricing_plans table )
-        */
+        
         return response()->json($user);
     }
     

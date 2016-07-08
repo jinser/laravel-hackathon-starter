@@ -159,7 +159,7 @@ Route::group(['middleware' => ['auth.basic'], 'prefix' => 'api'], function() {
     
     Route::group(['middleware' => ['permission:create_customeraccount']], function() {
      
-        Route::resource('customeraccount','Api\CustomerAccountApiController');
+        Route::resource('customeraccount','Api\CustomerAccountApiController', ['except'=> 'index','create','store']);
     });
     
     Route::group(['middleware' => ['permission:create_subscription']], function() {
@@ -168,3 +168,4 @@ Route::group(['middleware' => ['auth.basic'], 'prefix' => 'api'], function() {
     });
     
 });
+
