@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Subscriptions;
 use App\User;
 use App\PricingPlan;
 
@@ -24,8 +23,11 @@ class SubscriptionApiController extends Controller
     
     /**
      * returns all subscriptions belonging to a User with Customer role
+     * 
+     * cancelled plans have a non-null 'canceled_at' field in $response->subscriptions->data (array)
      */
     public function index() {
+       
         //get auth user and the stripe id
         $user = \Auth::user();
         $test = $user->stripe_id;
@@ -37,12 +39,11 @@ class SubscriptionApiController extends Controller
         
         $response = \Stripe\Customer::retrieve($test);
         
-        $subscriptions = Subscriptions::all();
-        $response = [
-            'subscriptions' => $subscriptions
+        $finalResponse = [
+            'all_subscriptions' => $response->subscriptions->data
         ];
         
-        return response()->json($response);
+        return response()->json($finalResponse);
         
     }
     
@@ -55,8 +56,6 @@ class SubscriptionApiController extends Controller
      * pricing plan using Laravel Cashier
      * 
      * Inputs:
-     * User object that has the credit card token
-     * 
      * $request should contain:
      * planid
      * plan name
@@ -67,10 +66,12 @@ class SubscriptionApiController extends Controller
        
         //check that user has a credit card already stored
         
+        $plan = PricingPlan::findOrFail($request->planid);
         
-        //if user is subscribed, update the plan
-        if($user->subscribed()) {
-            $success = 'success';
+        //if user is subscribed, return already subscribed, or update the plan
+        if($user->subscribed($plan->name)) {
+            $response = $this->_getErrorResponseJSON('is already subscribed');
+            return response()->json($response);
         }
         $userStripeId = $user->stripe_id;
         $this->_setStripeKey();
@@ -79,8 +80,8 @@ class SubscriptionApiController extends Controller
         
         //check if customer has credit card info
         if(count($custCards) == 0) {
-             $response = $this->_getErrorResponseJSON('no credit card information found. Please update your credit card information.');
-             return response()->json($response);
+              $response = $this->_getErrorResponseJSON('no credit card information found. Please update your credit card information.');
+              return response()->json($response);
         }
         
         //check validity of credit cards
@@ -103,11 +104,10 @@ class SubscriptionApiController extends Controller
         if($numOfFailedCards == count($custCards) || $numOfStoredCards == count($custCards)) {
             //return all credit cards failed, need to add a new credit card
             $response = $this->_getErrorResponseJSON('invalid credit card information found. Please update your credit card information.');
-             return response()->json($response);
+            return response()->json($response);
         }
         
         //get plan details
-        $plan = PricingPlan::findOrFail($request->planid);
         $pricingPlanFrequency = $plan->billing_frequency_period;
         if($pricingPlanFrequency == 'month') {
             $pricingPlanFrequency = 'monthly';
@@ -120,7 +120,7 @@ class SubscriptionApiController extends Controller
              return response()->json($response);
         }
        
-        //create sample token if does not exist
+        //TO REMOVE SAMPLE TOKEN - create sample token if does not exist
         if($user->card_brand == null) {
             $creditCardToken = \Stripe\Token::create(array(
               "card" => array(
@@ -135,15 +135,15 @@ class SubscriptionApiController extends Controller
                 $plan->name,
                 $request->planid
             )->create($creditCardToken->id);
+            return response()->json($creditCardToken);
         }
         
         //create subscription with laravel cashier
-        
         $user->newSubscription(
             $plan->name,
             $request->planid
         )->create();
-        //first param is plan name e.g. stripe test 2
+        //first param is plan name e.g. stripe sst 2
         //second param is the id of the plan in Stripe (id field, also is id of pricing_plans table )
         //creditCardToken can be null, if not null it will update the Stripe customer credit card details
         
@@ -169,6 +169,22 @@ class SubscriptionApiController extends Controller
         
         return response()->json($charge);
     }
+    
+    /**
+     * cancel subscription
+     * 
+     * 
+     * returns a response that includes a non-null ends_at field 
+     */
+    public function destroy($id) {
+        $user = \Auth::user();
+        
+        $plan = PricingPlan::findOrFail($id);
+        $response = $user->subscription($plan->name)->cancel();
+        return response()->json($response);
+        
+    }
+    
     
     private function _setStripeKey() {
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));

@@ -41,25 +41,26 @@ class UsersTableSeeder extends Seeder
         
         //check for unique email addresses
         $email = "customer@test.com";
-        $existingEmail = User::where("email",$email);
-        if($existinEmail == null) {
-            //proceed
+        $existingEmail = User::where("email",$email)->get();
+        if(count($existingEmail) != null) {
+        
         }
-        
-        //create in stripe
-        $this->_setStripeKey();
-        $stripe_response = \Stripe\Customer::create(array(
-            'email' => 'customer@test.com'
-        ));
-        
-        //create in database
-        $response = User::create([
-            'fullname' => 'customer_fullname',
-            'username' => 'test_customer',
-            'email' => 'customer@test.com',
-            'password' => Hash::make('welcome1'),
-            'stripe_id' => $stripe_response->id
-        ]);
+        else {
+            //create in stripe
+            $this->_setStripeKey();
+            $stripe_response = \Stripe\Customer::create(array(
+                'email' => 'customer@test.com'
+            ));
+            
+            //create in database
+            $response = User::create([
+                'fullname' => 'customer_fullname',
+                'username' => 'test_customer',
+                'email' => 'customer@test.com',
+                'password' => Hash::make('welcome1'),
+                'stripe_id' => $stripe_response->id
+            ]);
+        }
         
         
     }
